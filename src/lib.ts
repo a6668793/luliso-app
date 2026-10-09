@@ -1,6 +1,11 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { Status } from './shared';
 let supabase:SupabaseClient|null=null;
+let visitorSetup:Promise<import('@supabase/supabase-js').Session|null>|null=null;
+export function ensureVisitor(publicMode:boolean){
+ if(!visitorSetup)visitorSetup=(async()=>{if(!supabase)return null;const {data,error}=await supabase.auth.getSession();if(error)throw error;if(data.session||!publicMode)return data.session;const visitor=await supabase.auth.signInAnonymously();if(visitor.error)throw new Error('訪客模式暫時無法啟動，請稍後重試。');return visitor.data.session;})().catch(error=>{visitorSetup=null;throw error;});
+ return visitorSetup;
+}
 export function authClient(){return supabase;}
 export async function bootstrap():Promise<Status>{const response=await fetch('/api/index?action=status');if(!response.ok)throw new Error('目前無法連上服務，請稍後重試。');const status:Status=await response.json();if(status.supabaseUrl&&status.supabaseAnonKey&&!supabase)supabase=createClient(status.supabaseUrl,status.supabaseAnonKey);return status;}
 export async function api<T>(action:string,method='GET',body?:unknown):Promise<T>{const session=await supabase?.auth.getSession();const token=session?.data.session?.access_token;const response=await fetch(`/api/index?action=${action}`,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},...(body?{body:JSON.stringify(body)}:{})});const data=await response.json();if(!response.ok)throw new Error(data.error||'暫時無法完成，請再試一次。');return data;}

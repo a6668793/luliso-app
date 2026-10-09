@@ -6,12 +6,12 @@ React + TypeScript + Vite 手機優先 PWA。伺服器 API 使用 Supabase Auth 
 
 ## 目前交付狀態
 
-網站已部署於 https://luliso-app.vercel.app，Supabase 資料表與正式站連線設定已完成。使用者要求暫停功能實測以保留額度；尚未通過完整公開 Beta 驗收。公開登入的 SMTP 與 Google Drive 授權仍待設定。請見 [QA.md](QA.md)。
+網站已部署於 https://luliso-app.vercel.app。目前先開放免登入訪客模式，不需要信箱或建立帳號。每個瀏覽器保留獨立匿名 session，毛孩與紀錄仍存於私有資料庫；清除瀏覽器資料或換裝置後無法找回，跨裝置帳號紀錄留待後續版本。使用者要求暫停功能實測以保留額度；尚未通過完整公開 Beta 驗收。Google Drive 授權仍待設定。請見 [QA.md](QA.md)。
 
 - 六項功能：行為問卷個性故事、照片與影片影格分析、音訊分析、擬人化心聲、依寵物隔離的多輪聊天、多寵分析與附來源百科。
 - 電子郵件無密碼登入、多寵 CRUD、分析歷史、媒體管理、帳號刪除。
 - 390px 手機版、桌面版、PWA manifest / 圖示、隱私友善離線頁、reduced-motion。
-- 每帳號每日 10 次 AI 請求（Asia/Taipei），最多 100 MB / 200 檔媒體、12 隻寵物。
+- 每位訪客每日 10 次 AI 請求，公開模式全站每日共 30 次（Asia/Taipei），最多 100 MB / 200 檔媒體、12 隻寵物。
 - AI 不會將推測當成真正動物語言翻譯。影片以 4 張離散影格分析，非完整動作或聲音辨識。
 - Google Drive 明確 opt-in、OAuth refresh token、資料夾權限檢查及批次備份；未授權預設中斷。系統災難復原備份排程尚未建置。
 
@@ -32,6 +32,7 @@ pnpm check
 依 `.env.example` 設定伺服器環境變數。所有密鑰只存 `.env.local` 與 Vercel 敏感環境變數，不能加 `VITE_` 前綴、寫進程式或提交版本控制。Supabase 公開 URL 與 publishable/anon key 透過 status API 提供登入客戶端；service role key 永遠留在後端。
 
 1. 在 Supabase 建立專案，執行 `supabase/migrations/001_luliso.sql`。SQL 建立資料表、RLS、私有 bucket、原子額度與儲存容量限制。
+   公開模式另執行 `002_public_beta.sql`，在 Supabase Auth 啟用 anonymous sign-ins，伺服器設定 `PUBLIC_MODE=true`。API 仍必須驗證訪客 token；不開放所有人共享私人資料。匿名建立 session 由 Supabase IP rate limit 保護；大量公開使用前仍需加入 CAPTCHA 與過期匿名資料清理。
 2. 將 `SUPABASE_URL`、`SUPABASE_ANON_KEY`、`SUPABASE_SERVICE_ROLE_KEY` 設定到本機及 Vercel，勿貼到對話。
 3. Supabase Auth Site URL 與 redirect allowlist 設為已部署 HTTPS 網址；開發時另加 localhost。公開測試需配置可靠 SMTP、註冊防濫用及供應商費用限制。
 4. 設 `OPENAI_API_KEY`、`OPENAI_MODEL`（預設 gpt-4.1-mini）、`OPENAI_AUDIO_MODEL`（預設 gpt-audio-1.5）。帳號需有 API 可用額度。

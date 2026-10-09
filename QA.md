@@ -4,6 +4,9 @@
 
 ## 最新交付狀態
 
+- beta.2 改為免登入訪客模式：Supabase anonymous sign-ins 已啟用、PUBLIC_MODE=true；登入與註冊入口隱藏。匿名 session 仍受 API 驗證及個人資料隔離保護。
+- 新增 `002_public_beta.sql` 公開模式額度設定：每位訪客每日 10 次、全站共 30 次；尚未送出 AI 請求驗證。
+- 訪客模式的登入信件不再是必要項目；正式帳號功能留待後續版本。
 - GitHub：https://github.com/a6668793/luliso-app
 - 正式網站：https://luliso-app.vercel.app；Vercel 最新部署狀態 READY。
 - Supabase 專案 `mzremevbfiwwmxzoceqj` 已套用 migration；SQL 查詢確認 8 個資料表 RLS=true，`pet-media` bucket public=false。

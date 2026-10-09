@@ -11,7 +11,7 @@ export default async function handler(req:VercelRequest,res:VercelResponse){
  res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');
  try{
   const url=new URL(req.url||'/', 'http://localhost');const action=url.searchParams.get('action')||'status';const method=req.method||'GET';
-  if(action==='status'&&method==='GET')return res.json({version:'1.0.0-beta.1',supabaseUrl:process.env.SUPABASE_URL||null,supabaseAnonKey:process.env.SUPABASE_ANON_KEY||null,database:configured(),ai:!!process.env.OPENAI_API_KEY,drive:driveConfigured()?'configured':'disconnected'});
+  if(action==='status'&&method==='GET')return res.json({version:'1.0.0-beta.2',publicMode:process.env.PUBLIC_MODE==='true',supabaseUrl:process.env.SUPABASE_URL||null,supabaseAnonKey:process.env.SUPABASE_ANON_KEY||null,database:configured(),ai:!!process.env.OPENAI_API_KEY,drive:driveConfigured()?'configured':'disconnected'});
   if(!['GET','POST','PATCH','DELETE'].includes(method))throw new HttpError(405,'不支援的操作。');
   if(method!=='GET'&&req.headers.origin&&process.env.APP_ORIGIN&&req.headers.origin!==process.env.APP_ORIGIN)throw new HttpError(403,'無法從此來源送出請求。');
   if(Number(req.headers['content-length']||0)>100000)throw new HttpError(413,'請直接上傳媒體，不要將檔案放入文字請求。');
@@ -80,7 +80,7 @@ export default async function handler(req:VercelRequest,res:VercelResponse){
    let completed=0;for(const item of candidates.slice(0,2)){let bytes:Uint8Array;let mime:string;if(item.kind==='media'){const {data,error}=await db.storage.from('pet-media').download(item.value.path);checkDb(error);bytes=new Uint8Array(await data!.arrayBuffer());mime=item.value.mime;}else{bytes=new TextEncoder().encode(JSON.stringify(item.value));mime='application/json';}const driveId=await backupFile(`${userId}-${item.id}`,mime,bytes);const {error}=await db.from('backups').insert({user_id:userId,source_id:item.id,drive_file_id:driveId});if(error){await deleteBackup(driveId);checkDb(error);}completed++;}return res.json({completed,remaining:Math.max(0,candidates.length-completed)});
   }
   if(action==='account'&&method==='DELETE'){
-   z.object({confirmation:z.literal('刪除我的所有資料')}).parse(req.body);if(!user.last_sign_in_at||Date.now()-Date.parse(user.last_sign_in_at)>15*60*1000)throw new HttpError(403,'為保護帳號，請先登出並重新登入，再於 15 分鐘內刪除。');
+   z.object({confirmation:z.literal('刪除我的所有資料')}).parse(req.body);if(!user.is_anonymous&&(!user.last_sign_in_at||Date.now()-Date.parse(user.last_sign_in_at)>15*60*1000))throw new HttpError(403,'為保護帳號，請先登出並重新登入，再於 15 分鐘內刪除。');
    const {data:backups,error:be}=await db.from('backups').select('*').eq('user_id',userId);checkDb(be);for(const b of backups||[])await deleteBackup(b.drive_file_id);
    const {data:media,error:me}=await db.from('media').select('path').eq('user_id',userId);checkDb(me);if(media?.length){const {error}=await db.storage.from('pet-media').remove(media.map(m=>m.path));checkDb(error);}
    const {error}=await db.auth.admin.deleteUser(userId);checkDb(error);return res.json({ok:true});

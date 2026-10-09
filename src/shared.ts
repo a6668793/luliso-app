@@ -10,7 +10,7 @@ export type Analysis = {id:string;mode:Mode;pet_ids:string[];context:string;resu
 export type Message = {id:string;role:'user'|'assistant';content:string;created_at:string};
 export type ChatSession = {id:string;pet_id:string;title:string;created_at:string};
 export type Media = {id:string;path:string;mime:string;size:number;status:string;duration:number|null;url?:string};
-export type Status = {supabaseUrl:string|null;supabaseAnonKey:string|null;ai:boolean;database:boolean;drive:'disconnected'|'configured';version:string};
+export type Status = {supabaseUrl:string|null;supabaseAnonKey:string|null;ai:boolean;database:boolean;drive:'disconnected'|'configured';version:string;publicMode?:boolean};
 export const analysisInput = z.object({mode:z.enum(modes),pet_ids:z.array(z.string().uuid()).min(1).max(4),context:z.string().trim().max(5000),media_ids:z.array(z.string().uuid()).max(8),consent:z.literal(true)}).superRefine((v,ctx)=>{if(v.mode==='coexist'&&v.pet_ids.length<2)ctx.addIssue({code:'custom',message:'請選擇至少兩隻毛孩'});if(v.mode==='emotion'&&!v.media_ids.length)ctx.addIssue({code:'custom',message:'請加入照片或影片影格'});if(v.mode==='sound'&&!v.media_ids.length)ctx.addIssue({code:'custom',message:'請加入聲音'});});
 export const MAX_FILE_BYTES = 20 * 1024 * 1024;
 export const acceptedMimes = ['image/jpeg','image/png','image/webp','video/mp4','video/webm','audio/wav','audio/mpeg','audio/webm','audio/mp4'] as const;
