@@ -1,6 +1,6 @@
 import { z } from 'zod';
 export const modes = ['personality','emotion','sound','heart','coexist'] as const;
-export const petInput = z.object({name:z.string().trim().min(1).max(30),species:z.enum(['cat','dog']),birthday:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),sex:z.enum(['male','female','unknown']),breed:z.string().max(80),behavior:z.string().trim().min(10,'請至少填寫 10 字的日常行為').max(3000),tags:z.array(z.string().max(20)).max(8),photo_ids:z.array(z.string().uuid()).max(3).default([])});
+export const petInput = z.object({name:z.string().trim().min(1).max(30),species:z.enum(['cat','dog']),birthday:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),sex:z.enum(['male','female','unknown']),breed:z.string().max(80),behavior:z.string().trim().min(10,'請至少填寫 10 字的日常行為').max(3000),tags:z.array(z.string().max(20)).max(8),photo_ids:z.array(z.string().uuid()).max(5).default([])});
 export type PetInput = z.infer<typeof petInput>;
 export type Pet = PetInput & {id:string;user_id:string;created_at:string;personality:Report|null};
 export const reportSchema = z.object({heart:z.string().min(1).max(2000),observations:z.array(z.string().max(1000)).max(8),interpretations:z.array(z.string().max(1000)).max(8),suggestions:z.array(z.string().max(1000)).max(8),uncertainty:z.string().min(1).max(2000),safety:z.string().min(1).max(2000),tags:z.array(z.string().max(30)).max(8)});
