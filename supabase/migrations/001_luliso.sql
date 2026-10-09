@@ -44,6 +44,7 @@ do $$ declare t text; begin
  execute format('create policy own_read on public.%I for select to authenticated using ((select auth.uid())=user_id)',t);
  execute format('revoke all on public.%I from anon,authenticated',t);
  execute format('grant select on public.%I to authenticated',t);
+ execute format('grant all on public.%I to service_role',t);
  end loop; end $$;
 -- All writes go through authenticated server routes, never direct client writes.
 create function public.take_ai_quota(p_user uuid) returns boolean language plpgsql security definer set search_path=public as $$
@@ -65,3 +66,4 @@ insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types) v
 -- Signed upload URLs are created on the server only. No anonymous storage policy.
 create policy own_media_read on storage.objects for select to authenticated using(bucket_id='pet-media' and (storage.foldername(name))[1]=(select auth.uid())::text);
 commit;
+
