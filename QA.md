@@ -2,6 +2,16 @@
 
 日期：2026-10-09（Asia/Taipei）。只記錄實際完成的檢查，不將程式存在等同功能驗收。
 
+## 最新交付狀態
+
+- GitHub：https://github.com/a6668793/luliso-app
+- 正式網站：https://luliso-app.vercel.app；Vercel 最新部署狀態 READY。
+- Supabase 專案 `mzremevbfiwwmxzoceqj` 已套用 migration；SQL 查詢確認 8 個資料表 RLS=true，`pet-media` bucket public=false。
+- 正式站已保存 Supabase URL、公開連線憑證、伺服器管理憑證、OpenAI 金鑰與 APP_ORIGIN；秘密值未提交 GitHub。
+- Supabase Auth 已設定正式 Site URL 與 `/login`、`/settings` 回跳白名單。
+- 使用者要求先不測試以保留額度：停止新的功能實測與 AI 請求，登入、跨帳號隔離與六項 AI 端到端驗收仍待執行。
+- Google Drive 未授權；SMTP 尚未配置，公開訪客的登入寄信仍需完成寄信服務設定。
+
 ## 已執行
 
 | 檢查 | 結果 |
@@ -33,6 +43,7 @@
 
 ## 尚未驗證
 
-真實手機硬體相機/麥克風、PWA 安裝、Supabase migration 套用與跨帳號 RLS、登入信件、Drive OAuth/寫入/刪除、HTTPS 部署與路由重新整理。
+真實手機硬體相機/麥克風、PWA 安裝、跨帳號 RLS 整合流程、登入信件、Drive OAuth/寫入/刪除、HTTPS 網站端到端流程與路由重新整理。Supabase migration 與 HTTPS 部署已完成，不能視為上述流程已通過驗收。
 
 Google Drive：未連線；不會將公開資料夾連結當成寫入權限。
+

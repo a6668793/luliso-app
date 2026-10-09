@@ -6,7 +6,7 @@ React + TypeScript + Vite 手機優先 PWA。伺服器 API 使用 Supabase Auth 
 
 ## 目前交付狀態
 
-程式實作完成，尚待部署後端授權與驗收；不是已通過完整公開 Beta 驗收的版本。請見 [QA.md](QA.md)。
+網站已部署於 https://luliso-app.vercel.app，Supabase 資料表與正式站連線設定已完成。使用者要求暫停功能實測以保留額度；尚未通過完整公開 Beta 驗收。公開登入的 SMTP 與 Google Drive 授權仍待設定。請見 [QA.md](QA.md)。
 
 - 六項功能：行為問卷個性故事、照片與影片影格分析、音訊分析、擬人化心聲、依寵物隔離的多輪聊天、多寵分析與附來源百科。
 - 電子郵件無密碼登入、多寵 CRUD、分析歷史、媒體管理、帳號刪除。
@@ -62,3 +62,4 @@ Vercel 專案名稱 `luliso-app`，Framework Vite，Node 24，build `pnpm build`
 - [RSPCA：貓咪與其他寵物](https://www.rspca.org.uk/adviceandwelfare/pets/cats/company)
 - [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security)
 - [OpenAI audio inputs](https://developers.openai.com/api/docs/guides/audio-chat-completions)
+
