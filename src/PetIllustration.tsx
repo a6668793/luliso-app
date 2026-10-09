@@ -19,15 +19,17 @@ export function PetIllustration({ species, seed, decorative = false, className =
  return <svg className={`pet-illustration ${className}`} viewBox="0 0 160 160"
   role={decorative ? undefined : 'img'} aria-hidden={decorative || undefined} aria-labelledby={decorative ? undefined : id}>
   {!decorative ? <title id={id}>{cat ? '貓咪' : '狗狗'}小夥伴插畫</title> : null}
+  <defs><linearGradient id={`${id}-coat`} x1="0" y1="0" x2=".6" y2="1"><stop stopColor="#FFF8ED"/><stop offset=".35" stopColor={coat}/><stop offset="1" stopColor={coat}/></linearGradient></defs>
   <ellipse cx="81" cy="145" rx="48" ry="6" fill="#51483F" opacity=".08" />
   <g stroke="#66564B" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-   {cat ? <path d="M112 119C147 118 146 86 136 91C128 94 142 110 112 110" fill={coat} /> : <path d="M112 122Q145 114 130 100Q124 99 122 113" fill={coat} />}
-   <path d="M49 104Q40 125 48 137Q57 146 80 143Q103 146 113 137Q120 121 109 102Z" fill={coat} />
-   {cat ? <path d="M39 61L38 27Q38 23 43 27L65 42Q81 36 98 42L119 27Q124 23 124 29L122 65Q129 88 114 102Q99 116 80 112Q58 117 43 101Q28 85 39 61Z" fill={coat} /> : <>
+   {cat ? <path d="M112 119C147 118 146 86 136 91C128 94 142 110 112 110" fill={`url(#${id}-coat)`} /> : <path d="M112 122Q145 114 130 100Q124 99 122 113" fill={`url(#${id}-coat)`} />}
+   <path d="M49 104Q40 125 48 137Q57 146 80 143Q103 146 113 137Q120 121 109 102Z" fill={`url(#${id}-coat)`} />
+   {cat ? <path d="M39 61L38 27Q38 23 43 27L65 42Q81 36 98 42L119 27Q124 23 124 29L122 65Q129 88 114 102Q99 116 80 112Q58 117 43 101Q28 85 39 61Z" fill={`url(#${id}-coat)`} /> : <>
     <path d="M43 48Q24 47 23 75Q24 98 39 96L54 65M114 48Q136 45 139 75Q141 99 125 98L108 65" fill={n % 2 ? '#A38A77' : coat} />
-    <path d="M42 57Q49 37 80 39Q112 36 121 59L121 84Q119 112 82 114Q45 115 39 91Z" fill={coat} />
+    <path d="M42 57Q49 37 80 39Q112 36 121 59L121 84Q119 112 82 114Q45 115 39 91Z" fill={`url(#${id}-coat)`} />
    </>}
    {cat ? <g stroke="none" fill="#E8B8A7"><path d="M44 35L45 56L58 47Z" /><path d="M115 35L104 46L116 56Z" /></g> : null}
+   <g fill="#FFFDF9" opacity=".45" stroke="none"><ellipse cx="58" cy="58" rx="8" ry="4" transform="rotate(-25 58 58)"/><ellipse cx="102" cy="56" rx="5" ry="3"/></g>
    {patch === 1 ? <path d="M60 48Q81 41 96 47L88 65L81 71L72 64Z" fill="#FFFDF9" stroke="none" /> : null}
    {patch === 2 ? <g fill="none" stroke="#8B776B" opacity=".65"><path d="M68 43L71 56M81 42L81 54M94 43L91 56" />{cat ? <path d="M40 72L51 75M39 84L51 83M121 72L110 75M123 84L111 83" /> : null}</g> : null}
    <ellipse cx="81" cy="93" rx="22" ry="15" fill="#FFFDF9" stroke="none" opacity=".85" />
