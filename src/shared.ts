@@ -1,0 +1,17 @@
+import { z } from 'zod';
+export const modes = ['personality','emotion','sound','heart','coexist'] as const;
+export const petInput = z.object({name:z.string().trim().min(1).max(30),species:z.enum(['cat','dog']),birthday:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),sex:z.enum(['male','female','unknown']),breed:z.string().max(80),behavior:z.string().trim().min(10,'請至少填寫 10 字的日常行為').max(3000),tags:z.array(z.string().max(20)).max(8),photo_ids:z.array(z.string().uuid()).max(3).default([])});
+export type PetInput = z.infer<typeof petInput>;
+export type Pet = PetInput & {id:string;user_id:string;created_at:string;personality:Report|null};
+export const reportSchema = z.object({heart:z.string().min(1).max(2000),observations:z.array(z.string().max(1000)).max(8),interpretations:z.array(z.string().max(1000)).max(8),suggestions:z.array(z.string().max(1000)).max(8),uncertainty:z.string().min(1).max(2000),safety:z.string().min(1).max(2000),tags:z.array(z.string().max(30)).max(8)});
+export type Report = z.infer<typeof reportSchema>;
+export type Mode = typeof modes[number];
+export type Analysis = {id:string;mode:Mode;pet_ids:string[];context:string;result:Report;created_at:string};
+export type Message = {id:string;role:'user'|'assistant';content:string;created_at:string};
+export type ChatSession = {id:string;pet_id:string;title:string;created_at:string};
+export type Media = {id:string;path:string;mime:string;size:number;status:string;duration:number|null;url?:string};
+export type Status = {supabaseUrl:string|null;supabaseAnonKey:string|null;ai:boolean;database:boolean;drive:'disconnected'|'configured';version:string};
+export const analysisInput = z.object({mode:z.enum(modes),pet_ids:z.array(z.string().uuid()).min(1).max(4),context:z.string().trim().max(5000),media_ids:z.array(z.string().uuid()).max(8),consent:z.literal(true)}).superRefine((v,ctx)=>{if(v.mode==='coexist'&&v.pet_ids.length<2)ctx.addIssue({code:'custom',message:'請選擇至少兩隻毛孩'});if(v.mode==='emotion'&&!v.media_ids.length)ctx.addIssue({code:'custom',message:'請加入照片或影片影格'});if(v.mode==='sound'&&!v.media_ids.length)ctx.addIssue({code:'custom',message:'請加入聲音'});});
+export const MAX_FILE_BYTES = 20 * 1024 * 1024;
+export const acceptedMimes = ['image/jpeg','image/png','image/webp','video/mp4','video/webm','audio/wav','audio/mpeg','audio/webm','audio/mp4'] as const;
+export const uploadInput = z.object({mime:z.enum(acceptedMimes),size:z.number().int().min(1).max(MAX_FILE_BYTES),duration:z.number().min(0).max(15).nullable()}).superRefine((v,c)=>{if(v.mime.startsWith('video/')&&(v.duration===null||v.duration<5))c.addIssue({code:'custom',message:'影片需為 5–15 秒'});if(v.mime.startsWith('audio/')&&(v.duration===null||v.duration<1))c.addIssue({code:'custom',message:'音訊需為 1–15 秒'});});

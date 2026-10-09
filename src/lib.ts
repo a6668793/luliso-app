@@ -1,0 +1,7 @@
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import type { Status } from './shared';
+let supabase:SupabaseClient|null=null;
+export function authClient(){return supabase;}
+export async function bootstrap():Promise<Status>{const response=await fetch('/api/index?action=status');if(!response.ok)throw new Error('目前無法連上服務，請稍後重試。');const status:Status=await response.json();if(status.supabaseUrl&&status.supabaseAnonKey&&!supabase)supabase=createClient(status.supabaseUrl,status.supabaseAnonKey);return status;}
+export async function api<T>(action:string,method='GET',body?:unknown):Promise<T>{const session=await supabase?.auth.getSession();const token=session?.data.session?.access_token;const response=await fetch(`/api/index?action=${action}`,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},...(body?{body:JSON.stringify(body)}:{})});const data=await response.json();if(!response.ok)throw new Error(data.error||'暫時無法完成，請再試一次。');return data;}
+export async function upload(file:File,duration:number|null=null){const entry=await api<{id:string;path:string;token:string}>('upload','POST',{mime:file.type,size:file.size,duration});const client=authClient();if(!client)throw new Error('請先登入。');const {error}=await client.storage.from('pet-media').uploadToSignedUrl(entry.path,entry.token,file,{contentType:file.type});if(error)throw new Error('檔案上傳失敗，請到媒體管理清除未完成項目後重試。');await api('upload-complete','POST',{id:entry.id});return entry.id;}
